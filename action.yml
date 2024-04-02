@@ -8,10 +8,13 @@ inputs:
     default: main
   account_id:
     description: ""
-    required: false
+    required: true
   account_role_name:
     description: ""
-    required: false
+    required: true
+  role_session_name:
+    description: ""
+    required: true
   chain_account_id:
     description: ""
     required: false
@@ -31,7 +34,7 @@ runs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.role_name }}"
+          role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
           role-duration-seconds: 3600
           role-session-name: ${{ inputs.role_session_name }}
 
