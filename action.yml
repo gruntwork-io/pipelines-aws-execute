@@ -30,6 +30,9 @@ inputs:
   chain_account_role_name:
     description: ""
     required: false
+  branch:
+    description: ""
+    required: true
 runs:
   using: composite
   steps:
@@ -38,6 +41,7 @@ runs:
         uses: gruntwork-io-team/pipelines-bootstrap@main
         with:
           terragrunt_command: ${{ inputs.terragrunt_command }}
+          branch: ${{ inputs.branch }}
 
       - name: Authenticate to AWS
         uses: aws-actions/configure-aws-credentials@v4
