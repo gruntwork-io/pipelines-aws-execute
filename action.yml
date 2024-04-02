@@ -9,6 +9,12 @@ inputs:
     description: "The name of the configured deploy branch"
     required: false
     default: main
+  working_directory:
+    description: ""
+    required: true
+  aws_region:
+    description: ""
+    required: true
   account_id:
     description: ""
     required: true
@@ -36,7 +42,7 @@ runs:
       - name: Authenticate to AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-east-1
+          aws-region: ${{ inputs.aws_region }}
           role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
           role-duration-seconds: 3600
           role-session-name: ${{ inputs.role_session_name }}
@@ -46,7 +52,7 @@ runs:
         if: ${{ inputs.chain_account_id != '' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-east-1
+          aws-region: ${{ inputs.aws_region }}
           role-to-assume: "arn:aws:iam::${{ inputs.chain_account_id }}:role/${{ inputs.chain_acct_role_name }}"
           role-duration-seconds: 3600
           role-session-name: ${{ inputs.role_session_name }}
@@ -56,20 +62,20 @@ runs:
         shell: bash
         env:
           ACCOUNT: ${{ inputs.account_id }}
-          WORKING_DIRECTORY: ${{ steps.bootstrap.outputs.working_directory }}
+          WORKING_DIRECTORY: ${{ inputs.working_directory }}
         run: echo "::notice ::Running in account $ACCOUNT and planning in $WORKING_DIRECTORY"
 
-      - name: "[Terragrunt Execute] Run terragrunt ${{ steps.bootstrap.outputs.terragrunt_command }} in ${{ steps.bootstrap.outputs.working_directory }}"
+      - name: "[Terragrunt Execute] Run terragrunt ${{ steps.bootstrap.outputs.terragrunt_command }} in ${{ inputs.working_directory }}"
         id: terragrunt
         uses: gruntwork-io/pipelines-execute@v3.0.0
         with:
           token: ${{ inputs.gruntwork_code_access_token }}
+          working_directory: ${{ inputs.working_directory }}
           tf_version: ${{ steps.bootstrap.outputs.terraform_version }}
           tg_version: ${{ steps.bootstrap.outputs.terragrunt_version }}
           pipelines_cli_version: ${{ steps.bootstrap.outputs.pipelines_cli_version }}
-          working_directory: ${{ steps.bootstrap.outputs.working_directory }}
           terragrunt_command: ${{ steps.bootstrap.outputs.terragrunt_command }}
-          infra_live_repo: '.'
-          infra_live_directory: '.'
           infra_live_repo_branch: ${{ steps.bootstrap.outputs.branch }}
           gruntwork_config: "${{ steps.bootstrap.outputs.gruntwork_config }}"
+          infra_live_repo: '.'
+          infra_live_directory: '.'
