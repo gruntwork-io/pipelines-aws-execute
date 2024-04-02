@@ -2,6 +2,9 @@
 name: Terragrunt AWS Execute
 description: "Authenticates to AWS then invokes terragrunt"
 inputs:
+  gruntwork_code_access_token:
+    description: "The GRUNTWORK_CODE_ACCESS_TOKEN secret"
+    required: true
   terragrunt_command:
     description: "The name of the configured deploy branch"
     required: false
@@ -60,7 +63,7 @@ runs:
         id: terragrunt
         uses: gruntwork-io/pipelines-execute@v3.0.0
         with:
-          token: ${{ secrets.GRUNTWORK_CODE_ACCESS_TOKEN }}
+          token: ${{ inputs.gruntwork_code_access_token }}
           tf_version: ${{ steps.bootstrap.outputs.terraform_version }}
           tg_version: ${{ steps.bootstrap.outputs.terragrunt_version }}
           pipelines_cli_version: ${{ steps.bootstrap.outputs.pipelines_cli_version }}
