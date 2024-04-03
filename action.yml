@@ -40,6 +40,7 @@ runs:
         id: bootstrap
         uses: gruntwork-io-team/pipelines-bootstrap@main
         with:
+          token: ${{ inputs.gruntwork_code_access_token }}
           terragrunt_command: ${{ inputs.terragrunt_command }}
           branch: ${{ inputs.branch }}
 
