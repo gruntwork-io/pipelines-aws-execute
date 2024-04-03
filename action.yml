@@ -76,7 +76,7 @@ runs:
 
     - name: "[Terragrunt Execute] Run terragrunt ${{ steps.bootstrap.outputs.terragrunt_command }} in ${{ inputs.working_directory }}"
       id: terragrunt
-      uses: gruntwork-io/pipelines-execute@v3.0.0
+      uses: gruntwork-io/pipelines-execute@v3.0.0-beta2
       with:
         token: ${{ inputs.gruntwork_code_access_token }}
         working_directory: ${{ inputs.working_directory }}
@@ -85,6 +85,6 @@ runs:
         pipelines_cli_version: ${{ steps.bootstrap.outputs.pipelines_cli_version }}
         terragrunt_command: ${{ steps.bootstrap.outputs.terragrunt_command }}
         infra_live_repo_branch: ${{ steps.bootstrap.outputs.branch }}
-        gruntwork_config: "${{ steps.bootstrap.outputs.gruntwork_config }}"
+        gruntwork_config_file: "${{ steps.bootstrap.outputs.gruntwork_config_file }}"
         infra_live_repo: "."
         infra_live_directory: "."
