@@ -1,4 +1,3 @@
-
 name: Terragrunt AWS Execute
 description: "Authenticates to AWS then invokes terragrunt"
 inputs:
@@ -33,54 +32,59 @@ inputs:
   branch:
     description: ""
     required: true
+  gruntwork_context:
+    description: "Gruntwork Context From the Gruntwork Bootstrap step"
+    required: true
+
 runs:
   using: composite
   steps:
-      - name: "[Terragrunt Execute]: Read account request"
-        id: bootstrap
-        uses: gruntwork-io-team/pipelines-bootstrap@main
-        with:
-          token: ${{ inputs.gruntwork_code_access_token }}
-          terragrunt_command: ${{ inputs.terragrunt_command }}
-          branch: ${{ inputs.branch }}
+    - name: "[Terragrunt Execute]: Load Gruntwork Context"
+      id: bootstrap
+      uses: gruntwork-io-team/pipelines-bootstrap@main
+      with:
+        cache: ${{ inputs.gruntwork_context }}
+        token: ${{ inputs.gruntwork_code_access_token }}
+        terragrunt_command: ${{ inputs.terragrunt_command }}
+        branch: ${{ inputs.branch }}
 
-      - name: Authenticate to AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ inputs.aws_region }}
-          role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
-          role-duration-seconds: 3600
-          role-session-name: ${{ inputs.role_session_name }}
+    - name: Authenticate to AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ inputs.aws_region }}
+        role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
+        role-duration-seconds: 3600
+        role-session-name: ${{ inputs.role_session_name }}
 
-      # If we're doing a pipelines policy update, assume the role in the child account from the mgmt account
-      - name: "[Terragrunt Execute] Authenticate to Chained AWS account"
-        if: ${{ inputs.chain_account_id != '' }}
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-region: ${{ inputs.aws_region }}
-          role-to-assume: "arn:aws:iam::${{ inputs.chain_account_id }}:role/${{ inputs.chain_acct_role_name }}"
-          role-duration-seconds: 3600
-          role-session-name: ${{ inputs.role_session_name }}
-          role-chaining: true
+    # If we're doing a pipelines policy update, assume the role in the child account from the mgmt account
+    - name: "[Terragrunt Execute] Authenticate to Chained AWS account"
+      if: ${{ inputs.chain_account_id != '' }}
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ inputs.aws_region }}
+        role-to-assume: "arn:aws:iam::${{ inputs.chain_account_id }}:role/${{ inputs.chain_acct_role_name }}"
+        role-duration-seconds: 3600
+        role-session-name: ${{ inputs.role_session_name }}
+        role-chaining: true
 
-      - name: "[Terragrunt Execute] Confirm Account Access"
-        shell: bash
-        env:
-          ACCOUNT: ${{ inputs.account_id }}
-          WORKING_DIRECTORY: ${{ inputs.working_directory }}
-        run: echo "::notice ::Running in account $ACCOUNT and planning in $WORKING_DIRECTORY"
+    - name: "[Terragrunt Execute] Confirm Account Access"
+      shell: bash
+      env:
+        ACCOUNT: ${{ inputs.account_id }}
+        WORKING_DIRECTORY: ${{ inputs.working_directory }}
+      run: echo "::notice ::Running in account $ACCOUNT and planning in $WORKING_DIRECTORY"
 
-      - name: "[Terragrunt Execute] Run terragrunt ${{ steps.bootstrap.outputs.terragrunt_command }} in ${{ inputs.working_directory }}"
-        id: terragrunt
-        uses: gruntwork-io/pipelines-execute@v3.0.0
-        with:
-          token: ${{ inputs.gruntwork_code_access_token }}
-          working_directory: ${{ inputs.working_directory }}
-          tf_version: ${{ steps.bootstrap.outputs.terraform_version }}
-          tg_version: ${{ steps.bootstrap.outputs.terragrunt_version }}
-          pipelines_cli_version: ${{ steps.bootstrap.outputs.pipelines_cli_version }}
-          terragrunt_command: ${{ steps.bootstrap.outputs.terragrunt_command }}
-          infra_live_repo_branch: ${{ steps.bootstrap.outputs.branch }}
-          gruntwork_config: "${{ steps.bootstrap.outputs.gruntwork_config }}"
-          infra_live_repo: '.'
-          infra_live_directory: '.'
+    - name: "[Terragrunt Execute] Run terragrunt ${{ steps.bootstrap.outputs.terragrunt_command }} in ${{ inputs.working_directory }}"
+      id: terragrunt
+      uses: gruntwork-io/pipelines-execute@v3.0.0
+      with:
+        token: ${{ inputs.gruntwork_code_access_token }}
+        working_directory: ${{ inputs.working_directory }}
+        tf_version: ${{ steps.bootstrap.outputs.terraform_version }}
+        tg_version: ${{ steps.bootstrap.outputs.terragrunt_version }}
+        pipelines_cli_version: ${{ steps.bootstrap.outputs.pipelines_cli_version }}
+        terragrunt_command: ${{ steps.bootstrap.outputs.terragrunt_command }}
+        infra_live_repo_branch: ${{ steps.bootstrap.outputs.branch }}
+        gruntwork_config: "${{ steps.bootstrap.outputs.gruntwork_config }}"
+        infra_live_repo: "."
+        infra_live_directory: "."
