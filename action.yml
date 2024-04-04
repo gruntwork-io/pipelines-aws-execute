@@ -32,7 +32,7 @@ inputs:
   branch:
     description: ""
     required: true
-  terraform_version:
+  tofu_version:
     description: ""
     required: true
   terragrunt_version:
@@ -79,7 +79,7 @@ runs:
       with:
         token: ${{ inputs.gruntwork_code_access_token }}
         working_directory: ${{ inputs.working_directory }}
-        tf_version: ${{ inputs.terraform_version }}
+        tf_version: ${{ inputs.tofu_version }}
         tg_version: ${{ inputs.terragrunt_version }}
         pipelines_cli_version: ${{ inputs.pipelines_cli_version }}
         terragrunt_command: ${{ inputs.terragrunt_command }}
