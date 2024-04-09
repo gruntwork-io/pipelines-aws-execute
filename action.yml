@@ -38,7 +38,7 @@ runs:
     - name: Authenticate to AWS
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-region: ${{ inputs.aws_region }}
+        aws-region: ${{ steps.gruntwork_context.outputs.default_aws_region }}
         role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
         role-duration-seconds: 3600
         role-session-name: ${{ inputs.role_session_name }}
@@ -48,7 +48,7 @@ runs:
       if: ${{ inputs.chain_account_id != '' }}
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-region: ${{ inputs.aws_region }}
+        aws-region: ${{ steps.gruntwork_context.outputs.default_aws_region }}
         role-to-assume: "arn:aws:iam::${{ inputs.chain_account_id }}:role/${{ inputs.chain_acct_role_name }}"
         role-duration-seconds: 3600
         role-session-name: ${{ inputs.role_session_name }}
