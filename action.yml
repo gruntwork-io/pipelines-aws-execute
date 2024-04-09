@@ -42,6 +42,9 @@ inputs:
     description: ""
     required: true
     default: "opentofu"
+  deploy_branch_name:
+    description: ""
+    required: false
 runs:
   using: composite
   steps:
@@ -84,3 +87,4 @@ runs:
         gruntwork_config_file: "${{ inputs.gruntwork_config_file }}"
         infra_live_repo: "."
         infra_live_directory: "."
+        deploy_branch_name: ${{ inputs.deploy_branch_name }}
