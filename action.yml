@@ -32,16 +32,6 @@ inputs:
   branch:
     description: ""
     required: true
-  tofu_version:
-    description: ""
-    required: true
-  terragrunt_version:
-    description: ""
-    required: true
-  tf_binary:
-    description: ""
-    required: true
-    default: "opentofu"
   gruntwork_config_file:
     description: ""
     required: true
@@ -79,13 +69,10 @@ runs:
 
     - name: "[Terragrunt Execute] Run terragrunt ${{ inputs.terragrunt_command }} in ${{ inputs.working_directory }}"
       id: terragrunt
-      uses: gruntwork-io/pipelines-execute@v3.0.0-beta2
+      uses: gruntwork-io/pipelines-execute@v3.0.0-beta3
       with:
         token: ${{ inputs.gruntwork_code_access_token }}
         working_directory: ${{ inputs.working_directory }}
-        tf_version: ${{ inputs.tofu_version }}
-        tg_version: ${{ inputs.terragrunt_version }}
-        tf_binary: ${{ inputs.tf_binary }}
         pipelines_cli_version: ${{ inputs.pipelines_cli_version }}
         terragrunt_command: ${{ inputs.terragrunt_command }}
         infra_live_repo_branch: ${{ inputs.branch }}
