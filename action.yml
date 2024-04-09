@@ -38,6 +38,10 @@ inputs:
   pipelines_cli_version:
     description: ""
     required: true
+  tf_binary:
+    description: ""
+    required: true
+    default: "opentofu"
 runs:
   using: composite
   steps:
@@ -72,6 +76,7 @@ runs:
       uses: gruntwork-io/pipelines-execute@v3.0.0-beta3
       with:
         token: ${{ inputs.gruntwork_code_access_token }}
+        tf_binary: ${{ inputs.tf_binary }}
         working_directory: ${{ inputs.working_directory }}
         pipelines_cli_version: ${{ inputs.pipelines_cli_version }}
         terragrunt_command: ${{ inputs.terragrunt_command }}
