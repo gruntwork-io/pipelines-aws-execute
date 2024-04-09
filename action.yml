@@ -4,14 +4,7 @@ inputs:
   gruntwork_code_access_token:
     description: "The GRUNTWORK_CODE_ACCESS_TOKEN secret"
     required: true
-  terragrunt_command:
-    description: "The name of the configured deploy branch"
-    required: false
-    default: main
   working_directory:
-    description: ""
-    required: true
-  aws_region:
     description: ""
     required: true
   account_id:
@@ -29,25 +22,19 @@ inputs:
   chain_account_role_name:
     description: ""
     required: false
-  branch:
+  gruntwork_context:
     description: ""
     required: true
-  gruntwork_config_file:
-    description: ""
-    required: true
-  pipelines_cli_version:
-    description: ""
-    required: true
-  tf_binary:
-    description: ""
-    required: true
-    default: "opentofu"
-  deploy_branch_name:
-    description: ""
-    required: false
+
 runs:
   using: composite
   steps:
+    - name: "[Baseline]: Read account request"
+      id: gruntwork_context
+      uses: gruntwork-io-team/pipelines-bootstrap@main
+      with:
+        cache: ${{ inputs.gruntwork_context }}
+
     - name: Authenticate to AWS
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -79,12 +66,12 @@ runs:
       uses: gruntwork-io/pipelines-execute@v3.0.0-beta4
       with:
         token: ${{ inputs.gruntwork_code_access_token }}
-        tf_binary: ${{ inputs.tf_binary }}
+        tf_binary: ${{ steps.gruntwork_context.outputs.tf_binary }}
         working_directory: ${{ inputs.working_directory }}
-        pipelines_cli_version: ${{ inputs.pipelines_cli_version }}
-        terragrunt_command: ${{ inputs.terragrunt_command }}
-        infra_live_repo_branch: ${{ inputs.branch }}
-        gruntwork_config_file: "${{ inputs.gruntwork_config_file }}"
+        pipelines_cli_version: ${{ steps.gruntwork_context.outputs.pipelines_cli_version }}
+        terragrunt_command: ${{ steps.gruntwork_context.outputs.terragrunt_command }}
+        infra_live_repo_branch: ${{ steps.gruntwork_context.outputs.branch }}
+        gruntwork_config_file: "${{ steps.gruntwork_context.outputs.gruntwork_config_file }}"
         infra_live_repo: "."
         infra_live_directory: "."
-        deploy_branch_name: ${{ inputs.deploy_branch_name }}
+        deploy_branch_name: ${{ steps.gruntwork_context.outputs.deploy_branch_name }}
