@@ -76,7 +76,7 @@ runs:
 
     - name: "[Terragrunt Execute] Run terragrunt ${{ inputs.terragrunt_command }} in ${{ inputs.working_directory }}"
       id: terragrunt
-      uses: gruntwork-io/pipelines-execute@v3.0.0-beta3
+      uses: gruntwork-io/pipelines-execute@v3.0.0-beta4
       with:
         token: ${{ inputs.gruntwork_code_access_token }}
         tf_binary: ${{ inputs.tf_binary }}
