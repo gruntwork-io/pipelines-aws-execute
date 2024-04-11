@@ -35,6 +35,45 @@ runs:
       with:
         cache: ${{ inputs.gruntwork_context }}
 
+    # TODO: Make this whole thing something pipelines does.
+    # This step will determine the region to authenticate with in STS for role assumption.
+    # Note that this is different than the region where resources will be provisioned.
+    # The relevant `region.hcl` file that determines where relevant resources are located can generally be found
+    # in one of two locations:
+    # 1. For `run-all` commands, the `region.hcl` file will be at `account-name`/_global/region.hcl
+    # 2. For `plan` or `apply` commands, there's a `region.hcl` file above a given `terragrunt.hcl` file that indicates
+    #   the region a given terragrunt file should run in.
+    # 3. As a default, the region found in the account request file will be used, if found in `pipelines-bootstrap`.
+    # This step will check in both locations
+    - name: Determine Region
+      shell: bash
+      id: region
+      env:
+        WORKDIR: ${{ inputs.working_directory }}
+        DEFAULT_REGION: ${{ steps.gruntwork_context.outputs.default_aws_region }}
+      run: |
+        set -euo pipefail
+
+        if [[ -f $WORKDIR/_global/region.hcl ]]; then
+          # TODO: Parse the HCL and use that instead at some point.
+          region="$(grep 'aws_region' < "$WORKDIR/_global/region.hcl" | awk '{print $3}' | tr -d '"')"
+          echo "region=$region" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
+        cur_dir="$WORKDIR"
+
+        while [[ $cur_dir != '.' ]] && [[ $cur_dir != '/' ]] && cur_dir=$(dirname $cur_dir); do
+          if [[ -f $cur_dir/region.hcl ]]; then
+            # TODO: Parse the HCL and use that instead at some point.
+            region="$(grep 'aws_region' < "$cur_dir/region.hcl" | awk '{print $3}' | tr -d '"')"
+            echo "region=$region" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+        done
+
+        echo "region=$DEFAULT_REGION" >> $GITHUB_OUTPUT
+
     - name: Authenticate to AWS
       uses: aws-actions/configure-aws-credentials@v4
       with:
