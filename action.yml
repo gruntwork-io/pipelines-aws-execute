@@ -16,9 +16,6 @@ inputs:
   role_session_name:
     description: ""
     required: true
-  chain_account_id:
-    description: ""
-    required: false
   chain_account_role_name:
     description: ""
     required: false
@@ -81,17 +78,6 @@ runs:
         role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
         role-duration-seconds: 3600
         role-session-name: ${{ inputs.role_session_name }}
-
-    # If we're doing a pipelines policy update, assume the role in the child account from the mgmt account
-    - name: "[Terragrunt Execute] Authenticate to Chained AWS account"
-      if: ${{ inputs.chain_account_id != '' }}
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-region: ${{ steps.region.outputs.region }}
-        role-to-assume: "arn:aws:iam::${{ inputs.chain_account_id }}:role/${{ inputs.chain_acct_role_name }}"
-        role-duration-seconds: 3600
-        role-session-name: ${{ inputs.role_session_name }}
-        role-chaining: true
 
     - name: "[Terragrunt Execute] Confirm Account Access"
       shell: bash
