@@ -16,9 +16,6 @@ inputs:
   role_session_name:
     description: ""
     required: true
-  chain_account_role_name:
-    description: ""
-    required: false
   gruntwork_context:
     description: ""
     required: true
