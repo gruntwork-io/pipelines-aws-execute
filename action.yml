@@ -71,7 +71,6 @@ runs:
     - name: Authenticate to AWS
       id: aws_auth
       uses: aws-actions/configure-aws-credentials@v4
-      continue-on-error: true
       with:
         aws-region: ${{ steps.region.outputs.region }}
         role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
@@ -81,7 +80,7 @@ runs:
     - name: "Get Auth Failure Reason"
       shell: bash
       id: auth_failure_reason
-      if: ${{ steps.aws_auth.outcome == 'failure' }}
+      if: ${{ failure() }}
       env:
         ROLE_NAME: ${{ inputs.account_role_name }}
         IS_DELEGATED_REPO: ${{ steps.gruntwork_context.outputs.is_delegated_repo }}
@@ -97,11 +96,11 @@ runs:
 
     - name: "Add Auth Failure Notice if AWS Auth Fails"
       uses: gruntwork-io/pipelines-status-update@v0.1.0
-      if: ${{ steps.aws_auth.outcome == 'failure' }}
+      if: ${{ steps.auth_failure_reason.outcome == 'success' }}
       with:
         step_name: "AWS Authentication"
         step_status: "failure"
-        step_message: ${{ steps.auth_failure_reason.outputs.auth_failure_reason }}
+        step_details: ${{ steps.auth_failure_reason.outputs.auth_failure_reason }}
 
     - name: "[Terragrunt Execute] Confirm Account Access"
       if: ${{ steps.aws_auth.outcome == 'success' }}
