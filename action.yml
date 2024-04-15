@@ -69,14 +69,41 @@ runs:
         echo "region=$DEFAULT_REGION" >> $GITHUB_OUTPUT
 
     - name: Authenticate to AWS
+      id: aws_auth
       uses: aws-actions/configure-aws-credentials@v4
+      continue-on-error: true
       with:
         aws-region: ${{ steps.region.outputs.region }}
         role-to-assume: "arn:aws:iam::${{ inputs.account_id }}:role/${{ inputs.account_role_name }}"
         role-duration-seconds: 3600
         role-session-name: ${{ inputs.role_session_name }}
 
+    - name: "Get Auth Failure Reason"
+      id: auth_failure_reason
+      if: ${{ steps.aws_auth.outcome == 'failure' }}
+      env:
+        ROLE_NAME: ${{ inputs.account_role_name }}
+        IS_DELEGATED_REPO: ${{ steps.gruntwork_context.outputs.is_delegated_repo }}
+      run: |
+        # if the role_name begins with 'delegate' and the repo is a delegated repo, the role may not have been created yet
+        if [[ $ROLE_NAME == delegate* && $IS_DELEGATED_REPO == true ]]; then
+          reason="Failed to authenticate to AWS. The role may not have been created yet, contact your account administrator to ensure that access-control PRs for this account have been merged."
+        else
+          reason="Failed to authenticate to AWS. Check the role name and account ID."
+        fi
+
+        echo "auth_failure_reason=$reason" >> $GITHUB_OUTPUT
+
+    - name: "Add Auth Failure Notice if AWS Auth Fails"
+      uses: gruntwork-io/pipelines-status-update@v0.1.0
+      if: ${{ steps.aws_auth.outcome == 'failure' }}
+      with:
+        step_name: "AWS Authentication"
+        step_status: "failure"
+        step_message: ${{ steps.auth_failure_reason.outputs.auth_failure_reason }}
+
     - name: "[Terragrunt Execute] Confirm Account Access"
+      if: ${{ steps.aws_auth.outcome == 'success' }}
       shell: bash
       env:
         ACCOUNT: ${{ inputs.account_id }}
@@ -84,6 +111,7 @@ runs:
       run: echo "::notice ::Running in account $ACCOUNT and planning in $WORKING_DIRECTORY"
 
     - name: "[Terragrunt Execute] Run terragrunt ${{ inputs.terragrunt_command }} in ${{ inputs.working_directory }}"
+      if: ${{ steps.aws_auth.outcome == 'success' }}
       id: terragrunt
       uses: gruntwork-io/pipelines-execute@v3.0.0-beta5
       with:
