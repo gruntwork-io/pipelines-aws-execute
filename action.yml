@@ -79,6 +79,7 @@ runs:
         role-session-name: ${{ inputs.role_session_name }}
 
     - name: "Get Auth Failure Reason"
+      shell: bash
       id: auth_failure_reason
       if: ${{ steps.aws_auth.outcome == 'failure' }}
       env:
