@@ -96,7 +96,7 @@ runs:
 
     - name: "Add Auth Failure Notice if AWS Auth Fails"
       uses: gruntwork-io/pipelines-status-update@v0.1.0
-      if: ${{ steps.auth_failure_reason.outcome == 'success' }}
+      if: ${{ failure() }}
       with:
         step_name: "AWS Authentication"
         step_status: "failure"
