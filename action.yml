@@ -82,12 +82,12 @@ runs:
       id: auth_failure_reason
       if: ${{ failure() }}
       env:
-        ROLE_NAME: ${{ inputs.account_role_name }}
-        IS_DELEGATED_REPO: ${{ steps.gruntwork_context.outputs.is_delegated_repo }}
+        ACCOUNT_ID: ${{ inputs.account_id }}
+        ACCOUNT_ROLE_NAME: ${{ inputs.account_role_name }}
       run: |
-        # if the role_name begins with 'delegate' and the repo is a delegated repo, the role may not have been created yet
-        if [[ $ROLE_NAME == delegate* && $IS_DELEGATED_REPO == true ]]; then
-          reason="Failed to authenticate to AWS. The role may not have been created yet, contact your account administrator to ensure that access-control PRs for this account have been merged."
+        # if the role_name begins with 'delegate' the role may not have been created yet
+        if [[ $ACCOUNT_ROLE_NAME == delegate* ]]; then
+          reason="Failed to authenticate to AWS. The role may not have been created yet. Contact your account administrator to ensure that access-control PRs for this account($ACCOUNT_ID) have been merged."
         else
           reason="Failed to authenticate to AWS. Check the role name and account ID."
         fi
