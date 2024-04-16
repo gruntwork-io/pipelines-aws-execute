@@ -20,10 +20,19 @@ inputs:
     description: ""
     required: true
 
+
+outputs:
+  execute_stdout:
+    description: "The output of the Pipelines Execute command"
+    value: ${{ steps.execute.outputs.execute_output }}
+  plan_folder:
+    description: "A folder with plan files (if any)"
+    value: ${{ steps.execute.outputs.plan_folder }}
+
 runs:
   using: composite
   steps:
-    - name: "[Baseline]: Read account request"
+    - name: "Read in Gruntwork context"
       id: gruntwork_context
       uses: gruntwork-io-team/pipelines-bootstrap@main
       with:
@@ -111,7 +120,7 @@ runs:
 
     - name: "[Terragrunt Execute] Run terragrunt ${{ inputs.terragrunt_command }} in ${{ inputs.working_directory }}"
       if: ${{ steps.aws_auth.outcome == 'success' }}
-      id: terragrunt
+      id: execute
       uses: gruntwork-io/pipelines-execute@v3.0.0-beta5
       with:
         token: ${{ inputs.PIPELINES_READ_TOKEN }}
