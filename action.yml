@@ -102,6 +102,7 @@ runs:
         step_name: "AWS Authentication"
         step_status: "failed"
         step_details: ${{ steps.auth_failure_reason.outputs.auth_failure_reason }}
+        pull_request_number: ${{ steps.gruntwork_context.outputs.pr_number }}
 
     - name: "[Terragrunt Execute] Confirm Account Access"
       if: ${{ steps.aws_auth.outcome == 'success' }}
