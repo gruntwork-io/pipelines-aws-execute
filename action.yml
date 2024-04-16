@@ -45,6 +45,7 @@ runs:
       env:
         WORKDIR: ${{ inputs.working_directory }}
         DEFAULT_REGION: ${{ steps.gruntwork_context.outputs.default_aws_region }}
+        PR_NUMBER: ${{ github.event.number }}
       run: |
         set -euo pipefail
 
