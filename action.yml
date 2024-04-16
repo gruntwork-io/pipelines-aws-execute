@@ -99,7 +99,7 @@ runs:
       if: ${{ failure() }}
       with:
         step_name: "AWS Authentication"
-        step_status: "failure"
+        step_status: "failed"
         step_details: ${{ steps.auth_failure_reason.outputs.auth_failure_reason }}
 
     - name: "[Terragrunt Execute] Confirm Account Access"
