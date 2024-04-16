@@ -87,9 +87,9 @@ runs:
       run: |
         # if the role_name begins with 'delegate' the role may not have been created yet
         if [[ $ACCOUNT_ROLE_NAME == delegate* ]]; then
-          reason="Failed to authenticate to AWS. The role may not have been created yet. Contact your account administrator to ensure that access-control PRs for this account($ACCOUNT_ID) have been merged."
+          reason="Failed to authenticate to AWS. The role($ACCOUNT_ROLE_NAME) may not have been created yet. Contact your account administrator to ensure that access-control Pull Request for this account($ACCOUNT_ID) have been merged."
         else
-          reason="Failed to authenticate to AWS. Check the role name and account ID."
+          reason="Failed to authenticate to AWS. Verify that the role($ACCOUNT_ROLE_NAME) and account ID($ACCOUNT_ID) are correct."
         fi
 
         echo "auth_failure_reason=$reason" >> $GITHUB_OUTPUT
