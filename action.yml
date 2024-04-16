@@ -28,6 +28,9 @@ outputs:
   plan_folder:
     description: "A folder with plan files (if any)"
     value: ${{ steps.execute.outputs.plan_folder }}
+  formatted_plan_output:
+    description: "A string, formatted in GitHub Markdown, rendering human readable output of the plan"
+    value: ${{ steps.execute.outputs.formatted_plan_output }}
 
 runs:
   using: composite
@@ -121,7 +124,7 @@ runs:
     - name: "[Terragrunt Execute] Run terragrunt ${{ inputs.terragrunt_command }} in ${{ inputs.working_directory }}"
       if: ${{ steps.aws_auth.outcome == 'success' }}
       id: execute
-      uses: gruntwork-io/pipelines-execute@v3.0.0-beta5
+      uses: gruntwork-io/pipelines-execute@v3.0.1
       with:
         token: ${{ inputs.PIPELINES_READ_TOKEN }}
         tf_binary: ${{ steps.gruntwork_context.outputs.tf_binary }}
