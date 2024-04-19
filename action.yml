@@ -89,7 +89,7 @@ runs:
     - name: "[Terragrunt Execute] Run terragrunt ${{ inputs.terragrunt_command }} in ${{ inputs.working_directory }}"
       if: ${{ steps.aws_auth.outcome == 'success' }}
       id: execute
-      uses: gruntwork-io/pipelines-execute@v3.1.0
+      uses: gruntwork-io/pipelines-execute@main
       with:
         token: ${{ inputs.PIPELINES_READ_TOKEN }}
         tf_binary: ${{ steps.gruntwork_context.outputs.tf_binary }}
