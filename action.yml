@@ -89,7 +89,7 @@ runs:
     - name: "[Terragrunt Execute] Run terragrunt ${{ inputs.terragrunt_command }} in ${{ inputs.working_directory }}"
       if: ${{ steps.aws_auth.outcome == 'success' }}
       id: execute
-      uses: gruntwork-io/pipelines-execute@zach
+      uses: gruntwork-io/pipelines-execute@feat/add-dynamic-generation-of-mise
       with:
         token: ${{ inputs.PIPELINES_READ_TOKEN }}
         tf_binary: ${{ steps.gruntwork_context.outputs.tf_binary }}
