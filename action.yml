@@ -37,7 +37,7 @@ runs:
   steps:
     - name: "Read in Gruntwork context"
       id: gruntwork_context
-      uses: gruntwork-io/pipelines-bootstrap@main
+      uses: gruntwork-io/pipelines-bootstrap@v0.0.1
       with:
         cache: ${{ inputs.gruntwork_context }}
 
@@ -70,7 +70,7 @@ runs:
         echo "auth_failure_reason=$reason" >> $GITHUB_OUTPUT
 
     - name: "Add Auth Failure Notice if AWS Auth Fails"
-      uses: gruntwork-io/pipelines-status-update@main
+      uses: gruntwork-io/pipelines-status-update@v0.0.1
       if: ${{ failure() }}
       with:
         step_name: "AWS Authentication"
