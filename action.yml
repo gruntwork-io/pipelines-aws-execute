@@ -70,7 +70,7 @@ runs:
         echo "auth_failure_reason=$reason" >> $GITHUB_OUTPUT
 
     - name: "Add Auth Failure Notice if AWS Auth Fails"
-      uses: gruntwork-io/pipelines-status-update@v0.2.0
+      uses: gruntwork-io/pipelines-status-update@v0.2.1
       if: ${{ failure() }}
       with:
         step_name: "AWS Authentication"
